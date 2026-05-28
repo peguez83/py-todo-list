@@ -1,8 +1,13 @@
 # TODO List
 
-Aplicación de lista de tareas con backend REST (FastAPI + SQLAlchemy) y frontend (React + Vite).
+Aplicación de lista de tareas con backend REST (FastAPI + SQLAlchemy) y frontend (React + Vite) con autenticación JWT.
 
 Los datos se almacenan en una base de datos SQLite en memoria, por lo que se reinician al detener el servidor.
+
+Credenciales por defecto:
+
+- Usuario: `pablo`
+- Contraseña: `pabloTest`
 
 ---
 
@@ -71,6 +76,8 @@ Los archivos estáticos quedan en `frontend/dist/`.
 
 | Método   | Ruta            | Descripción                                      |
 |----------|-----------------|--------------------------------------------------|
+| `POST`   | `/auth/login`   | Iniciar sesión y obtener un JWT                  |
+| `GET`    | `/auth/me`      | Validar el token y obtener el usuario actual     |
 | `POST`   | `/todos/`       | Crear un nuevo todo                              |
 | `GET`    | `/todos/`       | Listar todos (filtro opcional `?completed=true`)  |
 | `GET`    | `/todos/{id}`   | Obtener un todo por ID                           |
@@ -82,15 +89,21 @@ Los archivos estáticos quedan en `frontend/dist/`.
 Crear un todo:
 
 ```bash
+TOKEN=$(curl -s -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"pablo","password":"pabloTest"}' | jq -r .access_token)
+
 curl -X POST http://localhost:8000/todos/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{"title": "Comprar leche", "description": "En el supermercado"}'
 ```
 
 Listar todos:
 
 ```bash
-curl http://localhost:8000/todos/
+curl http://localhost:8000/todos/ \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 Actualizar un todo:
@@ -98,11 +111,13 @@ Actualizar un todo:
 ```bash
 curl -X PUT http://localhost:8000/todos/1 \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{"completed": true}'
 ```
 
 Eliminar un todo:
 
 ```bash
-curl -X DELETE http://localhost:8000/todos/1
+curl -X DELETE http://localhost:8000/todos/1 \
+  -H "Authorization: Bearer $TOKEN"
 ```

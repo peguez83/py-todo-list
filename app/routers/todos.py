@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Todo
 from app.schemas import TodoCreate, TodoResponse, TodoUpdate
+from app.security import get_current_user
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
@@ -14,6 +15,7 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 def list_todos(
     completed: bool | None = None,
     db: Session = Depends(get_db),
+    _auth_guard=Depends(get_current_user),
 ):
     query = db.query(Todo)
     if completed is not None:
@@ -22,7 +24,11 @@ def list_todos(
 
 
 @router.get("/{todo_id}", response_model=TodoResponse)
-def get_todo(todo_id: int, db: Session = Depends(get_db)):
+def get_todo(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    _auth_guard=Depends(get_current_user),
+):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
@@ -30,7 +36,11 @@ def get_todo(todo_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=TodoResponse, status_code=201)
-def create_todo(todo_data: TodoCreate, db: Session = Depends(get_db)):
+def create_todo(
+    todo_data: TodoCreate,
+    db: Session = Depends(get_db),
+    _auth_guard=Depends(get_current_user),
+):
     todo = Todo(**todo_data.model_dump())
     db.add(todo)
     db.commit()
@@ -39,7 +49,12 @@ def create_todo(todo_data: TodoCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{todo_id}", response_model=TodoResponse)
-def update_todo(todo_id: int, todo_data: TodoUpdate, db: Session = Depends(get_db)):
+def update_todo(
+    todo_id: int,
+    todo_data: TodoUpdate,
+    db: Session = Depends(get_db),
+    _auth_guard=Depends(get_current_user),
+):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
@@ -55,7 +70,11 @@ def update_todo(todo_id: int, todo_data: TodoUpdate, db: Session = Depends(get_d
 
 
 @router.delete("/{todo_id}", status_code=204)
-def delete_todo(todo_id: int, db: Session = Depends(get_db)):
+def delete_todo(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    _auth_guard=Depends(get_current_user),
+):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")

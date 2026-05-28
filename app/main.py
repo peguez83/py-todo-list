@@ -4,12 +4,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routers import todos
+from app.database import SessionLocal
+from app.routers import auth, todos
+from app.security import ensure_default_user
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        ensure_default_user(db)
+    finally:
+        db.close()
     yield
 
 
@@ -29,3 +36,4 @@ app.add_middleware(
 )
 
 app.include_router(todos.router)
+app.include_router(auth.router)
