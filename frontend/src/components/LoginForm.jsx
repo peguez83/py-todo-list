@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 export default function LoginForm({ onLogin, loading }) {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   async function handleSubmit(e) {
