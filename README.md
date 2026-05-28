@@ -95,7 +95,7 @@ TOKEN=$(curl -s -X POST http://localhost:8000/auth/login \
 
 curl -X POST http://localhost:8000/todos/ \
   -H "Content-Type: application/json" \
-  # incluir el JWT en el header Authorization \
+  -H "Authorization: ******" \
   -d '{"title": "Comprar leche", "description": "En el supermercado"}'
 ```
 
@@ -103,7 +103,7 @@ Listar todos:
 
 ```bash
 curl http://localhost:8000/todos/ \
-  # incluir el JWT en el header Authorization
+  -H "Authorization: ******"
 ```
 
 Actualizar un todo:
@@ -111,7 +111,7 @@ Actualizar un todo:
 ```bash
 curl -X PUT http://localhost:8000/todos/1 \
   -H "Content-Type: application/json" \
-  # incluir el JWT en el header Authorization \
+  -H "Authorization: ******" \
   -d '{"completed": true}'
 ```
 
@@ -119,5 +119,5 @@ Eliminar un todo:
 
 ```bash
 curl -X DELETE http://localhost:8000/todos/1 \
-  # incluir el JWT en el header Authorization
+  -H "Authorization: ******"
 ```
