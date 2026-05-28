@@ -44,7 +44,7 @@ export default function App() {
         if (!cancelled) {
           setUser(currentUser);
         }
-      } catch (err) {
+      } catch {
         if (!cancelled) {
           clearStoredToken();
         }
