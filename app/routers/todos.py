@@ -15,7 +15,7 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 def list_todos(
     completed: bool | None = None,
     db: Session = Depends(get_db),
-    _current_user=Depends(get_current_user),
+    _auth_guard=Depends(get_current_user),
 ):
     query = db.query(Todo)
     if completed is not None:
@@ -27,7 +27,7 @@ def list_todos(
 def get_todo(
     todo_id: int,
     db: Session = Depends(get_db),
-    _current_user=Depends(get_current_user),
+    _auth_guard=Depends(get_current_user),
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
@@ -39,7 +39,7 @@ def get_todo(
 def create_todo(
     todo_data: TodoCreate,
     db: Session = Depends(get_db),
-    _current_user=Depends(get_current_user),
+    _auth_guard=Depends(get_current_user),
 ):
     todo = Todo(**todo_data.model_dump())
     db.add(todo)
@@ -53,7 +53,7 @@ def update_todo(
     todo_id: int,
     todo_data: TodoUpdate,
     db: Session = Depends(get_db),
-    _current_user=Depends(get_current_user),
+    _auth_guard=Depends(get_current_user),
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
@@ -73,7 +73,7 @@ def update_todo(
 def delete_todo(
     todo_id: int,
     db: Session = Depends(get_db),
-    _current_user=Depends(get_current_user),
+    _auth_guard=Depends(get_current_user),
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:

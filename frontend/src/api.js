@@ -31,7 +31,7 @@ async function request(path, options = {}) {
   if (authRequired) {
     const token = getStoredToken();
     if (token) {
-      requestHeaders.Authorization = 'Bearer ' + token;
+      requestHeaders.Authorization = `Bearer ${token}`;
     }
   }
 

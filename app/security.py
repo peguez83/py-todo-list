@@ -25,6 +25,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "
 DEFAULT_USERNAME = os.getenv("APP_USERNAME", "pablo")
 DEFAULT_PASSWORD = os.getenv("APP_PASSWORD", "pabloTest")
 
+if "APP_USERNAME" not in os.environ or "APP_PASSWORD" not in os.environ:
+    warnings.warn(
+        "APP_USERNAME and APP_PASSWORD are not set; using the built-in demo credentials.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)
 
