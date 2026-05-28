@@ -4,6 +4,12 @@ import { api } from './api';
 import TodoForm from './components/TodoForm';
 import TodoList from './components/TodoList';
 
+const FILTER_LABELS = [
+  { value: 'all', label: 'Todas' },
+  { value: 'pending', label: 'Pendientes' },
+  { value: 'completed', label: 'Completadas' },
+];
+
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -71,13 +77,13 @@ export default function App() {
         <TodoForm onAdd={handleAdd} />
 
         <section className="filters">
-          {['all', 'pending', 'completed'].map((f) => (
+          {FILTER_LABELS.map(({ value, label }) => (
             <button
-              key={f}
-              className={`filter-btn${filter === f ? ' active' : ''}`}
-              onClick={() => setFilter(f)}
+              key={value}
+              className={`filter-btn${filter === value ? ' active' : ''}`}
+              onClick={() => setFilter(value)}
             >
-              {f === 'all' ? 'Todas' : f === 'pending' ? 'Pendientes' : 'Completadas'}
+              {label}
             </button>
           ))}
         </section>
