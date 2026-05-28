@@ -22,8 +22,8 @@ if not SECRET_KEY:
     )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
-DEFAULT_USERNAME = os.getenv("APP_USERNAME", "admin")
-DEFAULT_PASSWORD = os.getenv("APP_PASSWORD", "admin123")
+DEFAULT_USERNAME = os.getenv("APP_USERNAME", "pablo")
+DEFAULT_PASSWORD = os.getenv("APP_PASSWORD", "pabloTest")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)

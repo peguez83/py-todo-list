@@ -6,8 +6,8 @@ Los datos se almacenan en una base de datos SQLite en memoria, por lo que se rei
 
 Credenciales por defecto:
 
-- Usuario: `admin`
-- Contraseña: `admin123`
+- Usuario: `pablo`
+- Contraseña: `pabloTest`
 
 ---
 
@@ -91,7 +91,7 @@ Crear un todo:
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r .access_token)
+  -d '{"username":"pablo","password":"pabloTest"}' | jq -r .access_token)
 
 curl -X POST http://localhost:8000/todos/ \
   -H "Content-Type: application/json" \
