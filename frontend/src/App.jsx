@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { api } from './api';
+import { api, clearStoredToken, getStoredToken, setStoredToken, ApiError } from './api';
+import LoginForm from './components/LoginForm';
 import TodoForm from './components/TodoForm';
 import TodoList from './components/TodoList';
 
@@ -11,17 +12,60 @@ const FILTER_LABELS = [
 ];
 
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authSubmitting, setAuthSubmitting] = useState(false);
   const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  function refresh() {
-    setRefreshKey((k) => k + 1);
+  function logout() {
+    clearStoredToken();
+    setUser(null);
+    setTodos([]);
+    setError('');
+    setLoading(false);
   }
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function validateSession() {
+      const token = getStoredToken();
+      if (!token) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const currentUser = await api.me();
+        if (!cancelled) {
+          setUser(currentUser);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          clearStoredToken();
+        }
+      } finally {
+        if (!cancelled) {
+          setAuthLoading(false);
+        }
+      }
+    }
+
+    validateSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     let cancelled = false;
 
     async function load() {
@@ -31,15 +75,45 @@ export default function App() {
         const data = await api.listTodos();
         if (!cancelled) setTodos(data);
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          if (err instanceof ApiError && err.status === 401) {
+            logout();
+          } else {
+            setError(err.message);
+          }
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-    return () => { cancelled = true; };
-  }, [refreshKey]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, refreshKey]);
+
+  async function handleLogin(username, password) {
+    setAuthSubmitting(true);
+    try {
+      const { access_token } = await api.login(username, password);
+      setStoredToken(access_token);
+      try {
+        const currentUser = await api.me();
+        setUser(currentUser);
+        setRefreshKey((k) => k + 1);
+      } catch (err) {
+        clearStoredToken();
+        throw err;
+      }
+    } finally {
+      setAuthSubmitting(false);
+    }
+  }
+
+  function refresh() {
+    setRefreshKey((k) => k + 1);
+  }
 
   async function handleAdd(data) {
     const created = await api.createTodo(data);
@@ -61,16 +135,39 @@ export default function App() {
     setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
   }
 
+  if (authLoading) {
+    return (
+      <div className="app auth-shell">
+        <p className="loading">Validando sesión…</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="app auth-shell">
+        <LoginForm onLogin={handleLogin} loading={authSubmitting} />
+      </div>
+    );
+  }
+
   const pending = todos.filter((t) => !t.completed).length;
   const done = todos.filter((t) => t.completed).length;
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>📝 TODO List</h1>
-        <p className="stats">
-          {pending} pendiente{pending !== 1 ? 's' : ''} · {done} completada{done !== 1 ? 's' : ''}
-        </p>
+        <div className="header-row">
+          <div>
+            <h1>📝 TODO List</h1>
+            <p className="stats">
+              {pending} pendiente{pending !== 1 ? 's' : ''} · {done} completada{done !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <button className="logout-btn" onClick={logout}>
+            Salir
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
