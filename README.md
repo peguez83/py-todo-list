@@ -1,26 +1,71 @@
-# TODO List API
+# TODO List
 
-Backend REST API para gestión de tareas (TODO list) construido con FastAPI y SQLAlchemy.
+Aplicación de lista de tareas con backend REST (FastAPI + SQLAlchemy) y frontend (React + Vite).
 
 Los datos se almacenan en una base de datos SQLite en memoria, por lo que se reinician al detener el servidor.
 
-## Requisitos
+---
+
+## Backend (FastAPI)
+
+### Requisitos
 
 - Python 3.12+
 
-## Instalación
+### Instalación
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Ejecución
+### Ejecución
 
 ```bash
 python -m uvicorn app.main:app --reload
 ```
 
 El servidor se levanta en `http://localhost:8000`.
+
+---
+
+## Frontend (React + Vite)
+
+### Requisitos
+
+- Node.js 18+
+
+### Instalación
+
+```bash
+cd frontend
+npm install
+```
+
+### Configuración (opcional)
+
+Copia el archivo de ejemplo y ajusta la URL del backend si es necesario:
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+### Ejecución en desarrollo
+
+```bash
+cd frontend
+npm run dev
+```
+
+La app se abre en `http://localhost:5173`.
+
+### Build para producción
+
+```bash
+cd frontend
+npm run build
+```
+
+Los archivos estáticos quedan en `frontend/dist/`.
 
 ## Endpoints
 
